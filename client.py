@@ -12,7 +12,7 @@ class Motif_graph():
     def __init__(self, graph, motif_dict):
         self.graph = graph
         
-        self.motif_dict = motif_dict#记录图中出现哪些motif，出现多少次
+        self.motif_dict = motif_dict
 
 class MotifDataset(Dataset):
     def __init__(self, dataset):
@@ -52,159 +52,26 @@ class Client_GC():
         self.convDWsNorm = 0.
 
 
-        self.motif_vocab = {} #记录出现的motif以及他们的出现次数
-        self.motif_count = {} #记录出现的motif以及含有他们的分子个数
+        self.motif_vocab = {} 
+        self.motif_count = {} 
         self.tf_idf = {}
         self.motif_dataset = []
         self.avg_tf = {}
         self.prototype = {}
-        self.prototype_code = {} #motif 编号：motif:code
-        self.code_motif = {}#code:motif,反编号
-        self.motif_code = {} #拥有的motif: code
+        self.prototype_code = {} 
+        self.code_motif = {}
+        self.motif_code = {} 
         self.motif_dataset = []
         self.motif_dict = []
-        self.motifset_dict = []# 记录motif——dataset里面所有的motif_dict
+        self.motifset_dict = []
 
 
-        self.code_prototype = {} #motif_code: prototype
+        self.code_prototype = {} 
 
         self.simi = {}
-        self.rs = {} #每个motif的reput
+        self.rs = {} 
         
-        
-        # for graph in graphs_train:
-        #     motif_freq = {} #记录图中出现motif以及次数
-        #     label = graph.x
-        #     _, label = torch.max(label, dim=1)
-        #     label = label.tolist()
-        #     #print(label)
-        #     if graph.edge_attr is not None:
-        #         graph_net = to_networkx(graph, to_undirected=True, edge_attrs=["edge_attr"])
-        #     else:
-        #         graph_net = to_networkx(graph, to_undirected=True)
-        #     mcb = nx.cycle_basis(graph_net)
-        #     mcb_tuple = [tuple(ele) for ele in mcb]
-            
-
-        #     edges = []
-        #     for e in graph_net.edges():
-        #         count = 0
-        #         for c in mcb_tuple:
-        #             if e[0] in set(c) and e[1] in set(c):
-        #                 count += 1
-        #                 break
-        #         if count == 0:
-        #             edges.append(e)
-        #     edges = list(set(edges))
-
-
-        #     for e in edges:
-        #         #print(graph_net.get_edge_data(e[0], e[1]))
-        #         if 'edge_attr' in graph_net.get_edge_data(e[0], e[1]):
-        #             weight = graph_net.get_edge_data(e[0], e[1])['edge_attr']
-        #             weight = weight.index(max(weight))
-        #         else:
-        #             weight = 1
-                
-        #         edge = ((label[e[0]], label[e[1]]), weight)
-        #         c = deepcopy(edge[0])
-        #         weight = deepcopy(edge[1])
-        #         for i in range(2):
-        #             #print((c,weight))
-        #             if (c, weight) in self.motif_vocab:
-        #                 self.motif_vocab[(c, weight)] += 1
-        #             else:
-        #                 c = (label[e[1]], label[e[0]])
-        #         if (c, weight) not in self.motif_vocab:
-        #             self.motif_vocab[(c, weight)] = 1
-
-        #         for i in range(2):
-        #             if (c, weight) in motif_freq:
-        #                 motif_freq[(c, weight)] += 1
-        #             else:
-        #                 c = (label[e[1]], label[e[0]])
-        #         if (c, weight) not in motif_freq:
-        #             motif_freq[(c, weight)] = 1
-
-
-
-
-        #     for m in mcb_tuple:
-        #         weight = tuple(self.find_ring_weights(m, graph_net))
-        #         #print(weight)
-        #         ring = []
-        #         for i in range(len(m)):
-                    
-        #             ring.append(label[m[i]])
-        #         cycle = (tuple(ring), weight)
-        #         c = deepcopy(cycle[0])
-        #         weight = deepcopy(cycle[1])
-        #         for i in range(len(c)):
-        #             if (c, weight) in self.motif_vocab:
-        #                 self.motif_vocab[(c, weight)] += 1
-        #             else:
-        #                 c = self.shift_right(c)
-        #                 weight = self.shift_right(weight)
-        #         if (c, weight) not in self.motif_vocab:
-        #             self.motif_vocab[(c, weight)] = 1
-
-        #         for i in range(len(c)):
-        #             if (c, weight) in motif_freq:
-        #                 motif_freq[(c, weight)] += 1
-        #             else:
-        #                 c = self.shift_right(c)
-        #                 weight = self.shift_right(weight)
-        #         if (c, weight) not in motif_freq:
-        #             motif_freq[(c, weight)] = 1
-        #     for motif in motif_freq.keys():
-        #         if motif not in self.motif_count.keys():
-        #             self.motif_count[motif] = 1
-        #         else:
-        #             self.motif_count[motif] += 1
-        #     #global motif_graph
-        #     graphs = Motif_graph
-        #     #motif = list(motif_freq.keys())
-        #     self.motif_dataset.append(graphs(graph, motif_freq))
-        # for motif_graph in self.motif_dataset:
-        #     #tf_idf = {}
-            
-        #     for motif in motif_graph.motif_dict:
-        #         c = motif_graph.motif_dict[motif] #出现次数
-        #         if c > 0:
-        #             M = len(self.motif_dataset) #总分子个数
-        #             N = self.motif_count[motif] #含有motif的分子个数
-        #             tf = c * (math.log((1 + M) / (1 + N)) + 1)
-        #             #tf_idf[motif] = tf
-        #             if motif not in self.tf_idf:
-        #                 self.tf_idf[motif] = []
-        #                 self.tf_idf[motif].append(tf)
-        #             else:
-        #                 self.tf_idf[motif].append(tf)
-        # for motif in self.tf_idf.keys():
-        #     self.avg_tf[motif] = mean(self.tf_idf[motif])
-        # self.avg_tf = sorted(self.avg_tf.items(), key = lambda x: x[1], reverse=True)
-        # rank_list = []
-        # a = int(len(self.avg_tf) * 0.9)
-        
-        
-        # for i in range(a):
-        #     rank_list.append(self.avg_tf[i])
-        # self.avg_tf = dict(rank_list)
-
-        
-        # for key in list(self.motif_count.keys()):
-        #     if key not in self.avg_tf:
-        #         self.motif_count.pop(key)
-
-
-        # for motif_graph in self.motif_dataset:
-        #     for key in list(motif_graph.motif_dict.keys()):
-        #         if key not in self.avg_tf:
-        #             motif_graph.motif_dict.pop(key)
-
-        # for key in self.motif_count.keys():
-        #     self.prototype[key] = []
-        
+      
         
 
 
@@ -219,7 +86,7 @@ class Client_GC():
         #print(self.prototype)
 
         for graph in self.graphs_train:
-            motif_freq = {} #记录图中出现motif以及次数
+            motif_freq = {} 
             label = graph.x
             _, label = torch.max(label, dim=1)
             label = label.tolist()
@@ -311,15 +178,15 @@ class Client_GC():
             graphs = Motif_graph
             #motif = list(motif_freq.keys())
             self.motif_dataset.append(graphs(graph, motif_freq))
-        #print('motif个数是:', len(self.motif_count.keys()))
+        
         for motif_graph in self.motif_dataset:
             #tf_idf = {}
             
             for motif in motif_graph.motif_dict:
-                c = motif_graph.motif_dict[motif] #出现次数
+                c = motif_graph.motif_dict[motif] 
                 if c > 0:
-                    M = len(self.motif_dataset) #总分子个数
-                    N = self.motif_count[motif] #含有motif的分子个数
+                    M = len(self.motif_dataset) 
+                    N = self.motif_count[motif] 
                     tf = c * (math.log((1 + M) / (1 + N)) + 1)
                     #tf_idf[motif] = tf
                     if motif not in self.tf_idf:
